@@ -1,3 +1,5 @@
+/* tslint:disable */
+
 // Type definitions for openpgpjs
 // Project: http://openpgpjs.org/
 // Definitions by: Guillaume Lacasa <https://blog.lacasa.fr>
@@ -6,31 +8,48 @@
 export as namespace openpgp;
 
 export interface KeyPair {
-    key: key.Key,
-    privateKeyArmored: string,
-    publicKeyArmored: string
+    key: key.Key;
+    privateKeyArmored: string;
+    publicKeyArmored: string;
 }
 
 export interface KeyOptions {
-    keyType?: enums.publicKey,
-    numBits: number,
-    userId: string,
-    passphrase: string,
-    unlocked?: boolean
+    keyType?: enums.publicKey;
+    numBits: number;
+    userIds: Array<{ name: string; email: string }>;
+    passphrase: string;
+    unlocked?: boolean;
+}
+
+export interface LookupOptions {
+    keyId?: string;
+    query?: string;
 }
 
 export interface Keyid {
-    bytes: string,
+    bytes: string;
 }
 
 export interface Signature {
-    keyid: Keyid,
-    valid: boolean
+    keyid: Keyid;
+    valid: boolean;
 }
 
 export interface VerifiedMessage {
-    text: string,
-    signatures: Array<Signature>
+    text: string;
+    signatures: Array<Signature>;
+}
+
+export interface SignMessage {
+    data: string;
+    privateKeys: any;
+    detached?: boolean;
+}
+
+export interface VerifyMessage {
+    message: any;
+    signature?: any;
+    publicKeys: any;
 }
 
 /** Decrypts message and verifies signatures
@@ -39,28 +58,42 @@ export interface VerifiedMessage {
     @param publicKeys array of keys to verify signatures
     @param msg the message object with signed and encrypted data
     */
-export function decryptAndVerifyMessage(privateKey: key.Key, publicKeys: Array<key.Key>, msg: string): Promise<VerifiedMessage>;
+export function decryptAndVerifyMessage(
+    privateKey: key.Key,
+    publicKeys: Array<key.Key>,
+    msg: string
+): Promise<VerifiedMessage>;
 /** Decrypts message and verifies signatures
 
     @param privateKey private key with decrypted secret key data
     @param publicKey single key to verify signatures
     @param msg the message object with signed and encrypted data
     */
-export function decryptAndVerifyMessage(privateKey: key.Key, publicKey: key.Key, msg: string): Promise<VerifiedMessage>;
+export function decryptAndVerifyMessage(
+    privateKey: key.Key,
+    publicKey: key.Key,
+    msg: string
+): Promise<VerifiedMessage>;
 
 /** Decrypts message
 
     @param privateKey private key with decrypted secret key data
     @param msg the message object with the encrypted data
     */
-export function decryptMessage(privateKey: key.Key, msg: message.Message): Promise<string>;
+export function decryptMessage(
+    privateKey: key.Key,
+    msg: message.Message
+): Promise<string>;
 
 /** Encrypts message text with keys
     @param keys array of keys used to encrypt the message
     @param text message as native JavaScript string
     @returns encrypted ASCII armored message
     */
-export function encryptMessage(keys: Array<key.Key>, message: string): Promise<string>;
+export function encryptMessage(
+    keys: Array<key.Key>,
+    message: string
+): Promise<string>;
 /** Encrypts message text with keys
 
     @param single key used to encrypt the message
@@ -71,7 +104,7 @@ export function encryptMessage(key: key.Key, message: string): Promise<string>;
 /** Generates a new OpenPGP key pair. Currently only supports RSA keys. Primary and subkey will be of same type.
     @param options
     */
-export function generateKeyPair(options: KeyOptions): Promise<KeyPair>;
+export function generateKey(options: KeyOptions): Promise<KeyPair>;
 
 /** Signs message text and encrypts it
 
@@ -79,41 +112,53 @@ export function generateKeyPair(options: KeyOptions): Promise<KeyPair>;
     @param privateKey private key with decrypted secret key data for signing
     @param text private key with decrypted secret key data for signing
     */
-export function signAndEncryptMessage(publicKeys: Array<key.Key>, privateKey: key.Key, text: string): Promise<string>;
+export function signAndEncryptMessage(
+    publicKeys: Array<key.Key>,
+    privateKey: key.Key,
+    text: string
+): Promise<string>;
 /** Signs message text and encrypts it
 
     @param publicKeys single key used to encrypt the message
     @param privateKey private key with decrypted secret key data for signing
     @param text private key with decrypted secret key data for signing
     */
-export function signAndEncryptMessage(publicKey: key.Key, privateKey: key.Key, text: string): Promise<string>;
+export function signAndEncryptMessage(
+    publicKey: key.Key,
+    privateKey: key.Key,
+    text: string
+): Promise<string>;
 
 /** Signs a cleartext message
 
     @param privateKeys array of keys with decrypted secret key data to sign cleartext
     @param text cleartext
     */
-export function signClearMessage(privateKeys: Array<key.Key>, text: string): Promise<string>;
+export function sign(
+    privateKeys: Array<key.Key>,
+    text: string
+): Promise<string>;
 /** Signs a cleartext message
 
     @param privateKeys single key with decrypted secret key data to sign cleartext
     @param text cleartext
     */
-export function signClearMessage(privateKey: key.Key, text: string): Promise<string>;
+export function sign(options: SignMessage): Promise<string>;
 
-/** Verifies signatures of cleartext signed message
-
-    @param publicKeys array of keys to verify signatures
-    @param msg cleartext message object with signatures
-    */
-export function verifyClearSignedMessage(publicKeys: Array<key.Key>, msg: cleartext.CleartextMessage): Promise<VerifiedMessage>;
 /** Verifies signatures of cleartext signed message
 
     @param publicKeys single key to verify signatures
     @param msg cleartext message object with signatures
     */
-export function verifyClearSignedMessage(publicKey: key.Key, msg: cleartext.CleartextMessage): Promise<VerifiedMessage>;
+export function verify(options: VerifyMessage): Promise<VerifiedMessage>;
 
+export class HKP {
+    constructor(keyServerBaseUrl: string);
+
+    lookup(options: LookupOptions): Promise<KeyPair>;
+
+    upload(publicKeyArmored: string): Promise<string>;
+}
 
 export namespace armor {
     /** Armor an OpenPGP binary packet block
@@ -123,7 +168,12 @@ export namespace armor {
         @param partindex
         @param parttotal
      */
-    function armor(messagetype: enums.armor, body: Object, partindex: number, parttotal: number): string;
+    function armor(
+        messagetype: enums.armor,
+        body: Object,
+        partindex: number,
+        parttotal: number
+    ): string;
 
     /** DeArmor an OpenPGP armored message; verify the checksum and return the encoded bytes
 
@@ -162,6 +212,10 @@ export namespace cleartext {
     function readArmored(armoredText: string): CleartextMessage;
 }
 
+export namespace signature {
+    function readArmored(armoredText: string): any;
+}
+
 export namespace config {
     var prefer_hash_algorithm: enums.hash;
     var encryption_cipher: enums.symmetric;
@@ -175,9 +229,9 @@ export namespace config {
 
 export namespace crypto {
     interface Mpi {
-        data: number,
-        read(input: string): number,
-        write(): string,
+        data: number;
+        read(input: string): number;
+        write(): string;
     }
 
     /** Generating a session key for the specified symmetric algorithm
@@ -201,15 +255,23 @@ export namespace crypto {
         @param secretMPIs Algorithm dependent multiprecision integers of the private key used
         @param data Data to be encrypted as MPI
      */
-    function publicKeyDecrypt(algo: enums.publicKey, publicMPIs: Array<Mpi>, secretMPIs: Array<Mpi>, data: Mpi): Mpi;
+    function publicKeyDecrypt(
+        algo: enums.publicKey,
+        publicMPIs: Array<Mpi>,
+        secretMPIs: Array<Mpi>,
+        data: Mpi
+    ): Mpi;
 
     /** Encrypts data using the specified public key multiprecision integers and the specified algorithm.
         @param algo Algorithm to be used
         @param publicMPIs Algorithm dependent multiprecision integers
         @param data Data to be encrypted as MPI
      */
-    function publicKeyEncrypt(algo: enums.publicKey, publicMPIs: Array<Mpi>, data: Mpi): Array<Mpi>;
-
+    function publicKeyEncrypt(
+        algo: enums.publicKey,
+        publicMPIs: Array<Mpi>,
+        data: Mpi
+    ): Array<Mpi>;
 
     namespace cfb {
         /** This function decrypts a given plaintext using the specified blockcipher to decrypt a message
@@ -218,7 +280,12 @@ export namespace crypto {
             @param ciphertext to be decrypted provided as a string
             @param resync a boolean value specifying if a resync of the IV should be used or not. The encrypteddatapacket uses the "old" style with a resync. Decryption within an encryptedintegrityprotecteddata packet is not resyncing the IV.
         */
-        function decrypt(cipherfn: string, key: string, ciphertext: string, resync: boolean): string;
+        function decrypt(
+            cipherfn: string,
+            key: string,
+            ciphertext: string,
+            resync: boolean
+        ): string;
 
         /** This function encrypts a given with the specified prefixrandom using the specified blockcipher to encrypt a message
             @param prefixrandom random bytes of block_size length provided as a string to be used in prefixing the data
@@ -227,7 +294,13 @@ export namespace crypto {
             @param key binary string representation of key to be used to encrypt the plaintext. This will be passed to the cipherfn
             @param resync a boolean value specifying if a resync of the IV should be used or not. The encrypteddatapacket uses the "old" style with a resync. Encryption within an encryptedintegrityprotecteddata packet is not resyncing the IV.
         */
-        function encrypt(prefixrandom: string, cipherfn: string, plaintext: string, key: string, resync: boolean): string;
+        function encrypt(
+            prefixrandom: string,
+            cipherfn: string,
+            plaintext: string,
+            key: string,
+            resync: boolean
+        ): string;
 
         /** Decrypts the prefixed data for the Modification Detection Code (MDC) computation
             @param cipherfn cipherfn.encrypt Cipher function to use
@@ -281,7 +354,13 @@ export namespace crypto {
             @param secretMPIs Private key multiprecision integers which is used to sign the data
             @param data Data to be signed
         */
-        function sign(hash_algo: enums.hash, algo: enums.publicKey, publicMPIs: Array<Mpi>, secretMPIs: Array<Mpi>, data: string): Mpi;
+        function sign(
+            hash_algo: enums.hash,
+            algo: enums.publicKey,
+            publicMPIs: Array<Mpi>,
+            secretMPIs: Array<Mpi>,
+            data: string
+        ): Mpi;
 
         /**
             @param algo public Key algorithm
@@ -290,7 +369,15 @@ export namespace crypto {
             @param publickey_MPIs Public key multiprecision integers
             @param data Data on where the signature was computed on
         */
-        function verify(algo: enums.publicKey, hash_algo: enums.hash, msg_MPIs: Array<Mpi>, publickey_MPIs: Array<Mpi>, data: string): boolean;
+        function verify(
+            algo: enums.publicKey,
+            hash_algo: enums.hash,
+            msg_MPIs: Array<Mpi>,
+            publickey_MPIs: Array<Mpi>,
+            data: string
+        ): boolean;
+
+        // function readArmored(armoredText: string): any;
     }
 }
 
@@ -338,7 +425,7 @@ export namespace enums {
         publicSubkey,
         userAttribute,
         symEncryptedIntegrityProtected,
-        modificationDetectionCode,
+        modificationDetectionCode
     }
 
     enum publicKey {
@@ -372,14 +459,14 @@ export namespace enums {
 
 export namespace key {
     interface KeyResult {
-        keys: Array<Key>,
-        err: Array<Error>
+        keys: Array<Key>;
+        err: Array<Error>;
     }
 
     /** Class that represents an OpenPGP key. Must contain a primary key. Can contain additional subkeys, signatures, user ids, user attributes.
      */
     interface Key {
-        armor(): string,
+        armor(): string;
         decrypt(passphrase: string): boolean;
         getExpirationTime(): Date;
         getKeyIds(): Array<Keyid>;
@@ -413,47 +500,47 @@ export namespace message {
     interface Message {
         /** Returns ASCII armored text of message
          */
-        armor(): string,
+        armor(): string;
 
         /** Decrypt the message
             @param privateKey private key with decrypted secret data
          */
-        decrypt(privateKey: key.Key): Array<Message>,
+        decrypt(privateKey: key.Key): Array<Message>;
 
         /** Encrypt the message
             @param keys array of keys, used to encrypt the message
          */
-        encrypt(keys: Array<key.Key>): Array<Message>,
+        encrypt(keys: Array<key.Key>): Array<Message>;
 
         /** Returns the key IDs of the keys to which the session key is encrypted
          */
-        getEncryptionKeyIds(): Array<Keyid>,
+        getEncryptionKeyIds(): Array<Keyid>;
 
         /** Get literal data that is the body of the message
          */
-        getLiteralData(): string,
+        getLiteralData(): string;
 
         /** Returns the key IDs of the keys that signed the message
          */
-        getSigningKeyIds(): Array<Keyid>,
+        getSigningKeyIds(): Array<Keyid>;
 
         /** Get literal data as text
          */
-        getText(): string,
+        getText(): string;
 
         /** Sign the message (the literal data packet of the message)
             @param privateKey private keys with decrypted secret key data for signing
          */
-        sign(privateKey: Array<key.Key>): Message,
+        sign(privateKey: Array<key.Key>): Message;
 
         /** Unwrap compressed message
          */
-        unwrapCompressed(): Message,
+        unwrapCompressed(): Message;
 
         /** Verify message signatures
             @param keys array of keys to verify signatures
          */
-        verify(keys: Array<key.Key>): Array<Object>,
+        verify(keys: Array<key.Key>): Array<Object>;
     }
 
     /** creates new message object from binary data
@@ -487,16 +574,16 @@ export namespace packet {
     }
 
     interface SecretKey extends PublicKey {
-        read(bytes:string): void;
+        read(bytes: string): void;
         write(): string;
         clearPrivateMPIs(str_passphrase: string): boolean;
-        encrypt(passphrase:string): void;
+        encrypt(passphrase: string): void;
     }
 
     /** Allocate a new packet from structured packet clone
         @param packetClone packet clone
      */
-    function fromStructuredClone(packetClone: Object): Object
+    function fromStructuredClone(packetClone: Object): Object;
 
     /** Allocate a new packet
         @param property name from enums.packet
@@ -518,20 +605,20 @@ export namespace util {
     /** Convert a string of utf8 bytes to a native javascript string
         @param utf8 A valid squence of utf8 bytes
      */
-    function decode_utf8(utf8: string): string
+    function decode_utf8(utf8: string): string;
 
     /** Convert a native javascript string to a string of utf8 bytes
         param str The string to convert
      */
-    function encode_utf8(str: string): string
+    function encode_utf8(str: string): string;
 
     /** Return the algorithm type as string
      */
-    function get_hashAlgorithmString(): string
+    function get_hashAlgorithmString(): string;
 
     /** Get native Web Cryptography api. The default configuration is to use the api when available. But it can also be deactivated with config.useWebCrypto
      */
-    function getWebCrypto(): Object
+    function getWebCrypto(): Object;
 
     /** Create binary string from a hex encoded string
         @param str Hex string to convert
