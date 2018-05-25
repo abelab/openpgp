@@ -1,0 +1,48 @@
+{
+  "_from": "@types/openpgp@0.0.29",
+  "_id": "@types/openpgp@0.0.29",
+  "_inBundle": false,
+  "_integrity": "sha512-z0W6ghY+Fo4Idd+y20pnvcZItdS5ARHUZkzPTK7Hy+GZ3u0MF0I8t31CQ7158T0HmBnA4NuZET0QIXDy6exbYg==",
+  "_location": "/@types/openpgp",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "version",
+    "registry": true,
+    "raw": "@types/openpgp@0.0.29",
+    "name": "@types/openpgp",
+    "escapedName": "@types%2fopenpgp",
+    "scope": "@types",
+    "rawSpec": "0.0.29",
+    "saveSpec": null,
+    "fetchSpec": "0.0.29"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/@types/openpgp/-/openpgp-0.0.29.tgz",
+  "_shasum": "feabb9d547cb107f7b98fdd51ac616f6cf5aaebd",
+  "_spec": "@types/openpgp@0.0.29",
+  "_where": "/Users/ryotanaka/webrtc",
+  "bundleDependencies": false,
+  "contributors": [
+    {
+      "name": "Guillaume Lacasa",
+      "url": "https://blog.lacasa.fr"
+    }
+  ],
+  "dependencies": {},
+  "deprecated": false,
+  "description": "TypeScript definitions for openpgpjs",
+  "license": "MIT",
+  "main": "",
+  "name": "@types/openpgp",
+  "repository": {
+    "type": "git",
+    "url": "https://www.github.com/DefinitelyTyped/DefinitelyTyped.git"
+  },
+  "scripts": {},
+  "typeScriptVersion": "2.0",
+  "typesPublisherContentHash": "b2b95416ffa12889126eeceff4aa8ccf13c37248268ffdc32fb3a572ea0095ef",
+  "version": "0.0.29"
+}
