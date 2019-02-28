@@ -41,7 +41,7 @@ export interface VerifiedMessage {
 }
 
 export interface SignMessage {
-    data: string;
+    message: any;
     privateKeys: any;
     detached?: boolean;
 }
